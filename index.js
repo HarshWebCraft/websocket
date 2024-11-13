@@ -54,8 +54,9 @@ function setupWebSocket(symbol) {
 
 // Start WebSocket for each symbol you want to track
 const symbols = [
-  "BTCUSD",
   "ETHUSD",
+  "BTCUSD",
+
   "DOGEUSD",
   "SOLUSD",
   "XRPUSD",
