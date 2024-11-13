@@ -2,7 +2,7 @@ const WebSocket = require("ws");
 const http = require("http");
 
 const WS_URL = "wss://socket.india.delta.exchange";
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
