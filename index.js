@@ -125,7 +125,6 @@ const symbols = [
   "BLURUSD",
 ];
 
-// Set up the WebSocket connection for all symbols when the route is called
 app.get("/start-websocket", (req, res) => {
   symbols.forEach((symbol) => setupWebSocket(symbol));
   res.send("WebSocket connections started for all symbols.");
