@@ -1,10 +1,12 @@
 const WebSocket = require("ws");
 const http = require("http");
+const express = require("express");
 
 const WS_URL = "wss://socket.india.delta.exchange";
 const PORT = process.env.PORT || 8080;
 
-const server = http.createServer();
+const app = express();
+const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 let latestPrices = {}; // Store latest prices by symbol
@@ -55,7 +57,6 @@ function setupWebSocket(symbol) {
 const symbols = [
   "ETHUSD",
   "BTCUSD",
-
   "DOGEUSD",
   "SOLUSD",
   "XRPUSD",
@@ -122,37 +123,39 @@ const symbols = [
   "OMNIUSD",
   "SUSHIUSD",
   "BLURUSD",
-]; // Add more symbols here
-symbols.forEach((symbol) => setupWebSocket(symbol));
+];
+
+// Set up the WebSocket connection for all symbols when the route is called
+app.get("/start-websocket", (req, res) => {
+  symbols.forEach((symbol) => setupWebSocket(symbol));
+  res.send("WebSocket connections started for all symbols.");
+});
 
 // Set up the server to listen for incoming connections
 server.listen(PORT, () => {
-  console.log(`WebSocket server listening on port ${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });
 
 // Handle client connections
 wss.on("connection", (ws) => {
   console.log("New client connected");
 
-  // Set a default message
   ws.send(
     JSON.stringify({
       message: "Welcome! Please specify a symbol to receive live updates.",
     })
   );
 
-  // Listen for client messages to subscribe to a specific symbol
   ws.on("message", (message) => {
     try {
       const data = JSON.parse(message);
 
       if (data.symbol && symbols.includes(data.symbol)) {
-        ws.subscribedSymbol = data.symbol; // Store the client's subscribed symbol
+        ws.subscribedSymbol = data.symbol;
         ws.send(
           JSON.stringify({ message: `Subscribed to ${data.symbol} updates.` })
         );
 
-        // Send the latest price immediately upon subscription
         if (latestPrices[data.symbol]) {
           ws.send(
             JSON.stringify({
